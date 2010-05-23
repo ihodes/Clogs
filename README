@@ -1,0 +1,27 @@
+# clogs
+
+Clogs is a simple Clojure application that generates
+static files for your blog: you upload a post, 
+Clogs sees it and regenerates a new index.html
+and then serves it up. 
+
+Also will handles archives, later
+
+## Uses
+
+clojure 1.1.0
+clojure-contrib 1.1.0
+compojure 0.4.0-RC3
+hiccup 0.2.4
+ring/ring-jetty-adapter 0.2.0
+
+## Installation
+
+lein deps
+lein repl core.clj
+
+## License
+
+Free to use and distribute. Attribute. Do not change license. 
+By Isaac Hodes May 2010
+www.copperthoughts.com
