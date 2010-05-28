@@ -1,60 +1,50 @@
 (ns clogs.core
-  (:import (java.io File)
-           (java.util Date)
+  (:import (java.util Date)
            (java.net URL))
   (:use compojure.core
-        ring.adapter.jetty
-        hiccup.core
-        hiccup.page-helpers
-        hiccup.form-helpers
-        clojure.xml
-        [clojure.contrib.def :only (defvar-)])
+        ring.adapter.jetty)
   (:require [compojure.route :as route]
-            [net.cgrand.enlive-html :as html]))
+            [net.cgrand.enlive-html :as html]
+            [clj-time.core :as clj-time]
+            [clj-time.format :as clj-time-fmt]
+            [clj-time.coerce :as time-coerce]
+            [clojure.xml :as xml]
+            [clojure.contrib.zip-filter :as zf]))
 
-;; Directory where all the posts are kept (organized by year)
-;; eg /home/user/posts
-;; and then posts would be organized like:
-;; ~/posts/1995/post_of_something.markdown
-(defvar- *post-dir* "/Users/ihodes/clogs/posts")
 
-;; Simple URL fetch
-(defn fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
-
-(defn hn-headlines []
-    (map html/text (html/select (fetch-url ) [:td.title :a])))
-
-;; Returns the publish date of a post (file)
+;; Time format (used in posts)
+;; Used to parse out and process time
+(def date-format
+     (clj-time-fmt/formatter "MM-dd-yyyy"))
+;; this isn't how I want to do things: this can't be efficient.
+(defn get-all-post-urls
+  "Returns list of URLs in the [dir] directory with file:// as the protocol."
+  [dir]
+  (map #(str "file://" %)
+       (map #(.getAbsolutePath %)
+            (filter #(.isFile %) (file-seq (java.io.File. dir))))))
+;; Returns the publish date of a post (URL)
 ;; format of date: month/day/year [xx/xx/xxxx]
 ;; format of output: java.util.Date
+;; (clj-time-fmt/parse date-format
 (defn get-pub-date
+  "Returns the publish date of a post (specified by the URL, with protocol).
+   Outputting a list of DatesTime objects (from Joda time lib)."
   [post]
-  (map html/text (html/select (fetch-url post) [:span#pubdate])))
+  (clj-time-fmt/parse date-format
+                      (first
+                       (map html/text
+                            (html/select (fetch-url post)
+                                         [:span.pubdate]))))) ;; be sure to 
+;; ... have a pdate specified in the post.
 
-;; Returns list of n newest posts in dir of form dir/year/posts.markdown
-;; Starts with newest year first: older year directories aren't
-;; searched if n posts are found in years before it.
-(defn find-n-newest-posts
-  [dir n]
-  (file-seq (java.io.File. dir)))
+;; used for sorting
+(defn newer-pub?
+  "Returns true if post1 is newer than post2. Posts are specified by URLs."
+  [post1 post2]
+  (> (time-coerce/to-long (get-pub-date post1))
+     (time-coerce/to-long (get-pub-date post2))))
 
-;; Filler function: needs to replace with Enlive stuff later.
-;; 
-;; PLAN: (TODO)
-;; Will pass in list of n posts (java.io.File) and parse them
-;; and output index.html to a file when done. [side effect]
-(defn render-new-index
-     [msg]
-     (html (doctype :html5) [:html [:body msg]]))
-
-;; Moves the new_index.html file into the index.html
-;; file; used after render-new-index is done.
-(defn refresh-index-files
-  []
-  (println "Done"))
-
-;; Routing function
 ;; add in routes like <(GET "\about" (slurp "path/to/about.html"))> as needed
 ;; 
 ;; TODO: add in regex to validate paths, and redirect certain failed routes
@@ -64,4 +54,4 @@
   (GET "/:something" [something] (str "\"" something "\" is not a valid URI here"))
   (route/not-found "Page not found: please go back home."))
 
-(run-jetty clogs {:port 8080})
+;(run-jetty clogs {:port 8080})

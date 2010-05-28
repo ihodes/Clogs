@@ -1,53 +1,54 @@
-(ns clogs.render-index
-  (:require [net.cgrand.enlive-html :as html])
-  (:use compojure.core
-        [clojure.contrib.duck-streams :only (spit)]))
-
-;; defines the html to be used as a template
-;; loads this from settings.clogs later
-(def *index-template-file* "resources/template_index.html")
-
-(defn render
-  "Little helper for taking a list of strings and making a string from it."
-  [xs]
-  (apply str xs))
-
-;; models a post: needs to add permalink portion later
-;; and needs to handle images, later
-(html/defsnippet post-model *index-template-file* [:.cg-post]
-  [{:keys [title author pubdate post-text]}]
-  [:.cg-post-title] (html/content title)
-  [:.cg-post-author] (html/content author)
-  [:.cg-post-pubdate] (html/content pubdate)
-  [:.cg-post-text] (html/html-content post-text))
-
-(html/deftemplate render-index *index-template-file*
-  [{:keys [posts]}]
-  [:.cg-wrap] (html/clone-for [post posts]
-                              (html/content (post-model post))))
-
-
-(def *fpost*
-     {:title "A post!"
-      :author "Isaac Hodes"
-      :pubdate "Today"
-      :post-text "There's some text here, but not much"})
-
-(def *fake-data*
-     {:posts [{:title "Wow, here's a post"
-               :author "Isaac Hodes"
-               :pubdate "May 10th, 2010"
-               :post-text "<p>My sophomore year at Carleton is coming to an end, and my summer is soon to begin.</p>
+<!DOCTYPE html>
+<html lang="en"> 
+  <head> 
+    <title>Copper Thoughts</title>
+    <meta charset="UTF-8" />
+    <link href="css/master.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="header"> 
+      <div id="head-wrap">
+        <div id="header-titles">
+          <h2>here be</h2>
+          <h1>Copper Thoughts.</h1>
+        </div>
+        <div id="twitter">
+          <img src="img/birdie.png" id="twitter-icon" />
+          <ul id="twitter_update_list"></ul> 
+          <a id="twitter-link" href="http://twitter.com/ihodes">follow me on <span id="twit-bigger">Twitter</span></a> 
+        </div>
+      </div>
+    </div>
+    <div id="content">
+      <div id="sidebar">
+        <div id="rss">
+          <a href="#">here's my rss</a>
+          <a href="#"><img src="img/rss.png" id="rss-icon" /></a>
+        </div>
+        <img src="img/isaac.jpeg" id="portrait" />
+        <ul>
+          <li><a href="#">Archives</a></li>
+          <li><a href="#">Projects</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="cg-wrap"><div class="cg-post">
+          <span class="cg-post-title">Wow, here's a post</span><br /><div id="lilmargie"></div>
+          <span class="cg-post-author">Isaac Hodes</span>
+          <span class="cg-post-pubdate">May 10th, 2010</span>
+          <div class="cg-post-text"><p>My sophomore year at Carleton is coming to an end, and my summer is soon to begin.</p>
 
 <p>Unfortunately, my summer really started early this week when temperatures hit 75º at night, and sleeping was a cruel impossibility. So instead of sleeping, I began to learn Clojure. I’d begun to learn this amazing language a few months ago, and quickly read through the majority of Stuart Halloway’s Programming Clojure, but I never really got around to writing any real code until earlier this week.</p>
 
 <p>Since then I’ve gone through some of the Project Euler problems, some little explorations of my own, and have begun to make headway in my first serious web-app: the backend of my new blog. I’m using mainly Enlive to write the blog (so far), and intend to make it a “baked” blog, both to improve the speed of the blog and the reduce both the complexity and resources required to set up a blog like it.</p>
 
-<p>I’ll be posting updates here as things move forward, and posting some potential designs rather soon, but in the meantime, I’ll struggle for sleep as both the excitement of programming in Clojure and the stifling heat of Minnesota keep me awake.</p>"}
-              {:title "Here's another one!"
-               :author "Isaac Hodes"
-               :pubdate "May 10th, 2010"
-               :post-text "<p>The one bank I always hear spoken positively of is USAA, and sometimes ING Direct, and with even some level of passion. But no one really loves their bank. No one has any real attachments to their bank other than the artificial and unnecessary strings banks keep you using their services with.</p>
+<p>I’ll be posting updates here as things move forward, and posting some potential designs rather soon, but in the meantime, I’ll struggle for sleep as both the excitement of programming in Clojure and the stifling heat of Minnesota keep me awake.</p></div>
+        <a href="#" id="comment-link">comments »</a>
+        </div></div><div class="cg-wrap"><div class="cg-post">
+          <span class="cg-post-title">Here's another one!</span><br /><div id="lilmargie"></div>
+          <span class="cg-post-author">Isaac Hodes</span>
+          <span class="cg-post-pubdate">May 10th, 2010</span>
+          <div class="cg-post-text"><p>The one bank I always hear spoken positively of is USAA, and sometimes ING Direct, and with even some level of passion. But no one really loves their bank. No one has any real attachments to their bank other than the artificial and unnecessary strings banks keep you using their services with.</p>
 
 <p>BankSimple is a new bank, and its goal is to be simple. Founded by Josh Reich, Shamir Karkal, and recently, Alex Payne, this bank looks promising for a few reasons, including the fact that over the course of a week, Josh and Shamir sent out hundreds of emails to people who had signed up to be involved in the bank’s beta and personally responded to all who replied. While this is certainly not a scalable and sustainable model with just a few employees, I already know how much they care about making their bank work for their customers.</p>
 
@@ -63,11 +64,13 @@
 
 <p>Finally, the way things are going now, the government is the only reason those “grave old men in suits” still have your money at all.﻿</p>
 
-<p>I can’t wait to start using BankSimple.</p>"}
-              {:title "Blah blah blah another test here"
-               :author "Isaac Hodes"
-               :pubdate "May 10th, 2010"
-               :post-text "<p>Appropriately, I am writing this as I lie in bed trying to cajole myself to sleep. I’m utterly failing; it is difficult to talk yourself into doing something you have no desire to do.</p>
+<p>I can’t wait to start using BankSimple.</p></div>
+        <a href="#" id="comment-link">comments »</a>
+        </div></div><div class="cg-wrap"><div class="cg-post">
+          <span class="cg-post-title">Blah blah blah another test here</span><br /><div id="lilmargie"></div>
+          <span class="cg-post-author">Isaac Hodes</span>
+          <span class="cg-post-pubdate">May 10th, 2010</span>
+          <div class="cg-post-text"><p>Appropriately, I am writing this as I lie in bed trying to cajole myself to sleep. I’m utterly failing; it is difficult to talk yourself into doing something you have no desire to do.</p>
 
 <p>When I sleep, it is a concession to the inconvenient demands of my imperfect body. It’s an implicit surrender to an ancient and inefficient imperative: energy conservation and consolidation of memories, as well as some other shenanigans we as the human race aren’t too sure of yet.</p>
 
@@ -77,11 +80,13 @@
 
 <p>When I do sleep, I relish every rare dream and every nightmare: at least then I feel alive.</p>
 
-<p>There is too little time in the world to do a tenth of what I plan to do. Why trade a second of that for something so close to death as sleep?</p>"}
-              {:title "Cantor sets and shiz"
-               :author "Isaac Hodes"
-               :pubdate "May 10th, 2010"
-               :post-text "<p>There is something about coffee shops and cafés (what’s the different between the two, anyway?) that makes them especially conducive to bouts of extreme productivity. I go to one, read for an hour, write a few thousand words for myself and for a newspaper article, work on a bit of math, program for another hour, and then head home.</p>
+<p>There is too little time in the world to do a tenth of what I plan to do. Why trade a second of that for something so close to death as sleep?</p></div>
+        <a href="#" id="comment-link">comments »</a>
+        </div></div><div class="cg-wrap"><div class="cg-post">
+          <span class="cg-post-title">Cantor sets and shiz</span><br /><div id="lilmargie"></div>
+          <span class="cg-post-author">Isaac Hodes</span>
+          <span class="cg-post-pubdate">May 10th, 2010</span>
+          <div class="cg-post-text"><p>There is something about coffee shops and cafés (what’s the different between the two, anyway?) that makes them especially conducive to bouts of extreme productivity. I go to one, read for an hour, write a few thousand words for myself and for a newspaper article, work on a bit of math, program for another hour, and then head home.</p>
 
 <p>If only I could keep that up for more than a few hours. After a while, the caffeine and an empty stomach begin to work together in particularly unpleasant ways, and the gentle hum of people in the coffee shop begins to grate. So I leave.</p>
 
@@ -89,11 +94,13 @@
 
 <p>•••</p>
 
-<p>As a side note, today I began to learn about Django, a web development framework I’ll need for an idea I’ll begin working on later this week. More information as that begins to come together. I had used Rails in the past, but decided I’d rather stick with Python (a language I’m familiar with) for this project. I’d just like to get something out there and useful at this point, rather than struggle with both a framework and an unfamiliar language like Ruby, beautiful though ﻿it may be.</p>"}
-              {:title "The last test title"
-               :author "Isaac Hodes"
-               :pubdate "May 10th, 2010"
-               :post-text "<p>At some point tomorrow, I’ll have deleted my Facebook account (or have tried my best to–I hear it’s difficult.)</p>
+<p>As a side note, today I began to learn about Django, a web development framework I’ll need for an idea I’ll begin working on later this week. More information as that begins to come together. I had used Rails in the past, but decided I’d rather stick with Python (a language I’m familiar with) for this project. I’d just like to get something out there and useful at this point, rather than struggle with both a framework and an unfamiliar language like Ruby, beautiful though ﻿it may be.</p></div>
+        <a href="#" id="comment-link">comments »</a>
+        </div></div><div class="cg-wrap"><div class="cg-post">
+          <span class="cg-post-title">The last test title</span><br /><div id="lilmargie"></div>
+          <span class="cg-post-author">Isaac Hodes</span>
+          <span class="cg-post-pubdate">May 10th, 2010</span>
+          <div class="cg-post-text"><p>At some point tomorrow, I’ll have deleted my Facebook account (or have tried my best to–I hear it’s difficult.)</p>
 
 <p>I’m certainly not the first, and there will be many more. Here’s why:</p>
 
@@ -127,4 +134,31 @@
 
 <p>So I am leaving Facebook, not just because they treat my data poorly, but because they treat me poorly. There will be an alternative eventually, and chances are that I’ll try it out. There’s room in my life for something like Facebook, but for now my email, Twitter, my blog and my phone will keep me close enough to everyone.</p>
 
-<p>* I meant to leave sooner, but were just so many juicy stories to post on Facebook about Facebook after F8.</p>"}]})  
+<p>* I meant to leave sooner, but were just so many juicy stories to post on Facebook about Facebook after F8.</p></div>
+        <a href="#" id="comment-link">comments »</a>
+        </div></div>
+      <div id="old-posts">
+        <div id="old-dates">
+          <ul>
+            <li><span id="date">from March 8th, 2010</span></li>
+            <li><span id="date">from February 6th, 2010</span></li>
+            <li><span id="date">from January 5th, 2010</span></li>
+          </ul>
+        </div>
+        <div id="old-titles">
+          <ul>
+            <li><a href="#">Convolution Reverb. Check it out.</a></li>
+            <li><a href="#">MedGraph</a></li>
+            <li><a href="#">Cold. Squares.</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="footer">
+      <div id="footer-text">A blog written and designed by Isaac Hodes, served by (<a id="mt-text" href="http://mediatemple.net/">mt</a>) and <a id="mint-text" href="http://haveamint.com/">Minted</a> with love<img id="mint-icon" src="img/mint.png" /></div>
+    </div>
+    <script src="http://twitter.com/javascripts/blogger.js" type="text/javascript"></script> 
+    <script src="http://twitter.com/statuses/user_timeline/ihodes.json?callback=twitterCallback2&amp;count=1" type="text/javascript"></script> 
+  </body>
+
+</html>
