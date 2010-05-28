@@ -10,8 +10,8 @@ Most documentation is in the source.
 
 - ClogsDaemon: launches the baker when a new posts is uploaded.
 - Baker: Checks to see if the post it's handed is newer than the 
-         newest post in the posts.xml file. Also should populate
-          an archives page.
+newest post in the posts.xml file. Also should populate
+an archives page.
 - Clogger: Handles an AtomFeed (and RSS).
 - CandlestickMaker: Handles comments in a oven-friendly manner.
 
