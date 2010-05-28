@@ -16,15 +16,18 @@ Most documentation is in the source.
 - CandlestickMaker: Handles comments in a oven-friendly manner.
 
 ## What?
-Is baking? http://www.aaronsw.com/weblog/000404
-Is with the name? Clojure + Blogs = Clogs and it's cute. That is all.
+####Is baking? 
+http://www.aaronsw.com/weblog/000404
+####Is with the name? 
+Clojure + Blogs = Clogs and it's cute. That is all.
 
 ## Uses
-clojure 1.1.0
-clojure-contrib 1.1.0
-enlive-1.0.0-SNAPSHOT
-clj-time-0.1.0-SNAPSHOT
+- clojure 1.1.0
+- clojure-contrib 1.1.0
+- enlive-1.0.0-SNAPSHOT
+- clj-time-0.1.0-SNAPSHOT
 
 ## License
 © Isaac Hodes 2010
+
 www.copperthoughts.com
