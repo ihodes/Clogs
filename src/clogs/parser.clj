@@ -1,6 +1,9 @@
 (ns clogs.parser
   (:require [clojure.xml :as xml]))
 
+;; Module handles parsing a (specially formatted) xml file into a easily-
+;; readable clojure hash-map.
+;; 
 ;; See below for information as to how the xml must be formatted
 ;; and how the map is structured.
 
