@@ -1,6 +1,5 @@
 (ns clogs.parser
   (:require [clojure.xml :as xml]))
-
 ;; Module handles parsing a (specially formatted) xml file into a easily-
 ;; readable clojure hash-map.
 ;; 
@@ -17,7 +16,7 @@
 ;; first result of parse + xml-seq of its boilerplate
   
 (defn- get-tags
-  "Gets the relevant tags from raw-posts"
+  "Gets the relevant tags from raw-posts."
   [posts]
   (first (for [post posts]
            (for [part post] (get part :tag)))))
@@ -32,15 +31,25 @@
 ;; Similar to get-tags. Content is partitioned per post.
 
 (defn- zip-tags-to-content
-  "Assembles a postmap to specifications (see below)"
+  "Assembles a postmap to specifications (see below)."
   [tags content]
   (assoc {} :posts
          (map #(zipmap tags %) content)))
 ;; Zips up the tags and content into a map.
 
+(defn parse-post
+  "Parses a simple XML file into a clojure map for a post"
+  [path]
+  (let [post (get (first (xml-seq
+                          (xml/parse (java.io.File. path))))
+                  :content)]
+    (zipmap
+     (map #(get % :tag) post)
+     (map #(first (get % :content)) post))))
+
 ;; this is the wrapper function
-(defn assemble-map
-  "Takes in a file's path and returns the final postmap"
+(defn assemble-map-posts
+  "Takes in a file's path and returns the final postmap."
   [path]
   (let [posts (raw-posts path)]
     (let [tags (get-tags posts)
@@ -68,7 +77,7 @@
 ;;           :pubdate "The time"
 ;;           :post-text "Here's some content"}]}
 ;;
-;;;; Parsed from an .xml files that loos like this:
+;;;; Parsed from an .xml file that loos like this:
 ;; <posts>
 ;;    <post>
 ;;      <title> A title 1 </title>
@@ -79,10 +88,3 @@
 ;;    ...
 ;; </posts>
 ;;;; Note that HTML is escaped in the XML.
-;;
-;;
-;;
-;;
-;;
-;;
-;;
