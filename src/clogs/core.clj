@@ -6,11 +6,22 @@
   (:require [compojure.route :as route]
             [clj-time.core :as clj-time]
             [clj-time.format :as clj-time-fmt]
-            [clj-time.coerce :as time-coerce]))
+            [clj-time.coerce :as time-coerce]
+            [clogs.parser :as parser]))
+
+(def *posts* "resources/posts.xml") ;; master posts.xml file for newest posts
+
 
 ;; Main process used to coordinate all post-parsing and page-rendering actions.
-;; 
+;;
+(def push-post-to-xml
+     "Takes a path to a XML post and prepends it to the *posts* file."
+     [path]
+     (let [post-map (parser/parse-post path)]
+       ));;;;;;;;;;;WORKING HERE
+       
 
+       
 ;; Time format (used in posts)
 ;; Used to parse out and process time
 (def date-format
@@ -30,6 +41,17 @@
   [post1 post2]
   (> (time-coerce/to-long (get-pub-date post1))
      (time-coerce/to-long (get-pub-date post2))))
+
+;;
+(defn post-to-xml
+  "Takes a path to a post and prepends it (correctly formatted) to
+the posts.xml file."
+  [post]
+  (let [post-text (splurt post)]
+    
+
+
+
 
 ;; add in routes like <(GET "\about" (slurp "path/to/about.html"))> as needed
 ;; 
