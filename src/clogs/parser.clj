@@ -47,9 +47,10 @@
      (map #(get % :tag) post)
      (map #(first (get % :content)) post))))
 
-;; this is the wrapper function
+;; this is the wrapper function - takes in the posts.xml file and emits a map
+;; for use in render/render-index and render/render-archives and render/render-rss
 (defn assemble-map-posts
-  "Takes in a file's path and returns the final postmap."
+  "Takes in a file's path and returns the final postmap. (used for posts.xml)"
   [path]
   (let [posts (raw-posts path)]
     (let [tags (get-tags posts)

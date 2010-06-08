@@ -4,62 +4,65 @@
   (:use compojure.core
         ring.adapter.jetty)
   (:require [compojure.route :as route]
+            [net.cgrand.enlive-html :as html]
             [clj-time.core :as clj-time]
             [clj-time.format :as clj-time-fmt]
             [clj-time.coerce :as time-coerce]
-            [clogs.parser :as parser]))
+            [clogs.parser :as parser]
+            [clogs.render :as render]
+            [clojure.contrib.duck-streams :as ducks]))
 
-(def *posts* "resources/posts.xml") ;; master posts.xml file for newest posts
+;;XML files
+(def *raw-posts* "resources/index.xml") ;; master index.xml file for newest posts
+(def *raw-archive* "resources/archive.xml") ;; master archive.xml file for newest archive
 
+(def *absolute-root* "") ;; root URL
+(def *posts-folder* "/p/") ;; folder where permalinked files go
+
+;;HTML files
+(def *index* "resources/index.html") ;; index.html file location
+(def *archive* "resources/archive.html") ;; archive.html file location
+
+;; builds a post into *posts-folder*
+;; processes the xml file adding a link to it to the new perma-post
+(defn build-perma-post
+  "Takes path to xml file and builds the permenant html file, and processes
+the input xml file to add a permalink to it. Spits permafile into *posts*."
+  [path name]
+  (do (ducks/spit (str *posts-folder* name ".html")
+                  (render/render
+                   (render/render-post (parser/parse-post path))))
+      (ducks/spit path
+                  (str "<post>\n"
+                       "    <perm-url>" *posts-folder* name
+                       ".html</perm-url>\n" 
+                       (apply str (drop 7 (slurp path)))))))
+                    
+
+;; builds the index from the *raw-posts* file and spits it to *index*
+(defn build-index
+  []
+  (ducks/spit *index*
+              (render/render
+               (render/render-index (parser/assemble-map-posts *raw-posts*)))))
+
+;; builds the archive from the *raw-archive* file and spits it to *archive*
+(defn build-archive
+  []
+  (ducks/spit *archive*
+              (render/render
+               (render/render-archive (parser/assemble-map-posts *raw-archive*)))))
 
 ;; Main process used to coordinate all post-parsing and page-rendering actions.
 ;;
-(def push-post-to-xml
-     "Takes a path to a XML post and prepends it to the *posts* file."
-     [path]
-     (let [post-map (parser/parse-post path)]
-       ));;;;;;;;;;;WORKING HERE
+;; (defn push-post-to-xml
+;;      "Takes a path to a XML post and prepends it to the *posts* file."
+;;      [path]
+;;      (let [post-map (parser/parse-post path)]
+;;        ));;;;;;;;;;;WORKING HERE
        
+;; (defn pop-post-from-xml
+;;   "Pops a post from the end of the posts.xml file."
+;;   ());;working here
 
-       
-;; Time format (used in posts)
-;; Used to parse out and process time
-(def date-format
-     (clj-time-fmt/formatter "MM-dd-yyyy"))
-
-;; this isn't how I want to do things: this can't be efficient.
-(defn get-all-post-urls
-  "Returns list of URLs in the [dir] directory with file:// as the protocol."
-  [dir]
-  (map #(str "file://" %)
-       (map #(.getAbsolutePath %)
-            (filter #(.isFile %) (file-seq (java.io.File. dir))))))
-
-;; used for sorting
-(defn newer-pub?
-  "Returns true if post1 is newer than post2. Posts are specified by URLs."
-  [post1 post2]
-  (> (time-coerce/to-long (get-pub-date post1))
-     (time-coerce/to-long (get-pub-date post2))))
-
-;;
-(defn post-to-xml
-  "Takes a path to a post and prepends it (correctly formatted) to
-the posts.xml file."
-  [post]
-  (let [post-text (splurt post)]
-    
-
-
-
-
-;; add in routes like <(GET "\about" (slurp "path/to/about.html"))> as needed
-;; 
-;; TODO: add in regex to validate paths, and redirect certain failed routes
-(defroutes clogs
-  (GET "/" [] (slurp "/Users/ihodes/clogs/html/index.html"))
-  (GET "/:year/:name" [name] (render-new-index name))
-  (GET "/:something" [something] (str "\"" something "\" is not a valid URI here"))
-  (route/not-found "Page not found: please go back home."))
-
-;(run-jetty clogs {:port 8080})
+  
