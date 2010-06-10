@@ -38,7 +38,8 @@
 ;; Zips up the tags and content into a map.
 
 (defn parse-post
-  "Parses a simple XML file into a clojure map for a post"
+  "Parses a simple XML file into a clojure map for a post.
+   The post is nested in one <post> tag."
   [path]
   (let [post (get (first (xml-seq
                           (xml/parse (java.io.File. path))))
