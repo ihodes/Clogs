@@ -1,8 +1,6 @@
 (ns clogs.core
   (:import (java.util Date)
            (java.net URL))
-  (:use compojure.core
-        ring.adapter.jetty)
   (:require [compojure.route :as route]
             [net.cgrand.enlive-html :as html]
             [clj-time.core :as clj-time]
@@ -12,19 +10,20 @@
             [clogs.render :as render]
             [clojure.contrib.duck-streams :as ducks]))
 
-;;XML files
-(def *raw-index* "resources/index.xml") ;; master index.xml file for newest posts
-(def *raw-archive* "resources/archive.xml") ;; master archive.xml file for newest archive
-
+;; Folders
 (def *absolute-root* "") ;; root URL
 (def *posts-folder* "/p/") ;; folder where permalinked files go
 (def *raw-posts-folder* "/p/posts/") ;; folder where XML posts go
 
-;;HTML files
+;; XML files
+(def *raw-index* "resources/index.xml") ;; master index.xml file for newest posts
+(def *raw-archive* "resources/archive.xml") ;; master archive.xml file for newest archive
+
+;; HTML files
 (def *index* "resources/index.html") ;; index.html file location
 (def *archive* "resources/archive.html") ;; archive.html file location
 
-;; basic date parser (gets Date from a string required in posting)
+;; basic date format (for getting date from XML)
 (def clg-time-fmt (clj-time-fmt/formatter "dd-MM-yyyy"))
 
 (defn init-post
@@ -47,47 +46,33 @@
     (ducks/spit (str *raw-posts-folder* year (:perm-url post-map) ".xml") ;; path to post
                 (render/render (render/render-raw-post post-map)))))      ;; renders XML file
 
-;; inserts a post into the *raw-index* file (prepends)
 (defn prepend-post-raw-index
   "Prepends the XML file at `path` to  *raw-index*."
   [path]
   (let [post (slurp path)]
-    (spit *raw-index*
+    (ducks/spit *raw-index*
           (apply str (html/emit*
                       (html/at (first (html/html-resource *raw-index*)) ;; at the raw index-file
                           [:post] (html/before post))))))) ;; sticks the post before the first post
 
-;; removes the last raw post in the *raw-index*
 (defn pop-raw-post
   "Removes (pops) the last post from *raw-index*."
   []
-  
+  (ducks/spit *raw-index*
+        (apply str (html/emit*
+                    (html/at (first (html/html-resource *raw-index*))
+                             [[:post last-child]] nil))))) 
 
-  
-;; builds the index from the *raw-index* file and spits it to *index*
 (defn build-index
+  "Builds the index from the *raw-index* file and spits it to *index*."
   []
   (ducks/spit *index*
               (render/render (render/render-index
                               (parser/assemble-map-posts *raw-posts*)))))
 
-;; builds the archive from the *raw-archive* file and spits it to *archive*
 (defn build-archive
+  "Builds the archive from the *raw-archive* file and spits it to *archive*."
   []
   (ducks/spit *archive*
               (render/render
                (render/render-archive (parser/assemble-map-posts *raw-archive*)))))
-
-;; Main process used to coordinate all post-parsing and page-rendering actions.
-;;
-;; (defn push-post-to-xml
-;;      "Takes a path to a XML post and prepends it to the *posts* file."
-;;      [path]
-;;      (let [post-map (parser/parse-post path)]
-;;        ));;;;;;;;;;;WORKING HERE
-       
-;; (defn pop-post-from-xml
-;;   "Pops a post from the end of the posts.xml file."
-;;   ());;working here
-
-  
