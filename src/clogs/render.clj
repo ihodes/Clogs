@@ -3,42 +3,26 @@
   (:use compojure.core
         [clojure.contrib.duck-streams :only (spit)]))
 
-;; This module handles formatting a clojure hash-map into a HTML template
-;; with proper tags (specified below).
-;;
-;; tags/classes (indented as nested):
-;;    .cg-wrap
-;;        .cg-post
-;;            .cg-post-title
-;;            .cg-post-author
-;;            .cg-post-pubdate
-;;            .cg-post-text
-;;
-;;
-;;
-;;
-;; defines the html to be used as a template
-;; loads this from settings.clogs later
+;; defines the html/xml to be used as a template(s)
+;; loads this from settings.clogs later...
 (def *index-template-file* "resources/templates/template_index.html")
 (def *archive-template-file* "resources/templates/template_archive.html")
 (def *post-template-file* "resources/templates/template_post.html")
-(def *raw-post-template* "resoucres/p/posts/post.xml")
+(def *raw-post-template* "resources/p/posts/post.xml")
 
 (defn render
-  "Little helper for taking a list of strings and making a string from it."
-  [xs]
-  (apply str xs))
+  "Concats a list of strings."
+  [x]
+  (apply str x))
 
-
-;; models a post: 
+;; models a post in the index and individual post page
 (html/defsnippet post-model *index-template-file* [:.cg-post]
-  [{:keys [title author pubdate post-text perm-url]}]
+  [{:keys [title author clgdate content perm-url]}]
   [:span.cg-post-title] (html/content title)
   [:a.cg-post-title ] (html/set-attr :href perm-url)
   [:.cg-post-author] (html/content author)
-  [:.cg-post-pubdate] (html/content pubdate)
-  [:.cg-post-text] (html/html-content post-text))
-
+  [:.cg-post-pubdate] (html/content clgdate)
+  [:.cg-post-text] (html/html-content content))
 
 ;; models an archive listing 
 (html/defsnippet archive-listing-model *archive-template-file* [:.cg-post]
@@ -63,12 +47,12 @@
 
 ;; models an XML post
 (html/deftemplate render-raw-post *raw-post-template*
-  [{:keys [title author content date perma-url]}]
+  [{:keys [title author content clgdate-norm perm-url]}]
   [:title] (html/content title)
-  [:perma-url] (html/content perma-url)
+  [:perm-url] (html/content perm-url)
   [:author] (html/content author)
   [:content] (html/content content)
-  [:clgdate] (html/content date))
+  [:clgdate-norm] (html/content clgdate-norm))
 
 ;; renders the html file for index.html
 ;; takes in a clojure map as emitted by parser/assemble-map-posts
