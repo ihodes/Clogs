@@ -6,12 +6,11 @@
             [clj-time.format :as clj-time-fmt]
             [clj-time.coerce :as time-coerce]
             [clogs.parser :as parser]
-            [clogs.render :as render]
-            [clojure.contrib.duck-streams :as ducks]))
+            [clogs.render :as render]))
 
 ;; Folders
 (def *absolute-root* "resources/") ;; root URL
-(def *posts-folder* (str *absolute-root* "p/")) ;; folder where permalinked files go
+(def *posts-folder* (str *absolute-root* "p/")) ;; folder where permalinked posts go
 (def *raw-posts-folder* (str *absolute-root* "p/posts/")) ;; folder where XML posts go
 
 ;; XML files
@@ -20,7 +19,7 @@
 
 ;; HTML files
 (def *index* (str *absolute-root* "index.html")) ;; index.html file location
-(def *archive* (str *absolute-root* "archive.html")) ;; archive.html file location
+(def *archives* (str *absolute-root* "archives.html")) ;; archive.html file location
 
 ;; basic date format (for getting date from XML)
 (def clg-time-fmt (clj-time-fmt/formatter "dd-MM-yyyy"))
@@ -29,7 +28,7 @@
   (let [y (clj-time/year (clj-time-fmt/parse clg-time-fmt date))
         m (clj-time/month (clj-time-fmt/parse clg-time-fmt date))
         d (clj-time/day (clj-time-fmt/parse clg-time-fmt date))]
-    (str m "/" d ", " y)))
+    (str m "." d "." y)))
 ;; generic transform that does nothing cool now.
 ;; eg MM-DD-YYYY -> MM/DD, YYYY
 (def txclgdate basic-clgdate-formatter)
@@ -69,7 +68,7 @@
   (let [year (.getYear (clj-time-fmt/parse clg-time-fmt (:clgdate-norm post-map)))
         s (. java.io.File separator)]         ;; parses the year from the date string
     (do
-      (ducks/spit (str *raw-posts-folder* year s (:perm-url post-map) ".xml") ;; path to post
+      (spit (str *raw-posts-folder* year s (:perm-url post-map) ".xml") ;; path to post
                   (render/render (render/render-raw-post post-map)))
       (println (str *raw-posts-folder* year s (:perm-url post-map) ".xml")))));; renders XML file
 
@@ -87,19 +86,19 @@
         s (. java.io.File separator)
         clgdate (txclgdate (:clgdate-norm post-map)) ;;transform clgdate-norm into a nice-to-read form
         post-map (merge {:clgdate clgdate} post-map)] ;; stick it into the postmap
-    (ducks/spit (str *posts-folder* year s (:perm-url post-map) ".html")
+    (spit (str *posts-folder* year s (:perm-url post-map) ".html")
                 (render/render (render/render-post post-map)))))
 
 (defn prepend-raw-post-a
   "Prepends the XML file at `path` to *raw-archive*."
-  [path]
+  [path])
   
 
 (defn prepend-raw-post-i
   "Prepends the XML file at `path` to  *raw-index*."
   [path]
   (let [post (slurp path)]
-    (ducks/spit *raw-index*
+    (spit *raw-index*
           (apply str (html/emit*
                       (html/at (first (html/html-resource *raw-index*)) ;; at the raw index-file
                           [:post] (html/before post))))))) ;; sticks the post before the first post
@@ -107,7 +106,7 @@
 (defn pop-raw-post-i
   "Removes (pops) the last post from *raw-index*."
   []
-  (ducks/spit *raw-index*
+  (spit *raw-index*
         (apply str (html/emit*
                     (html/at (first (html/html-resource *raw-index*))
                              [[:post last-child]] nil))))) 
@@ -115,13 +114,13 @@
 (defn build-index
   "Builds the index from the *raw-index* file and spits it to *index*."
   []
-  (ducks/spit *index*
+  (spit *index*
               (apply str (render/render-index
                               (parser/assemble-map-posts *raw-posts*)))))
 
 (defn build-archive
   "Builds the archive from the *raw-archive* file and spits it to *archive*."
   []
-  (ducks/spit *archive*
+  (spit *archive*
               (apply str
                (render/render-archive (parser/assemble-map-posts *raw-archive*)))))
