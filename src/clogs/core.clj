@@ -1,26 +1,20 @@
 (ns clogs.core
-  (:import (java.util Date)
-           (java.net URL))
-  (:require [net.cgrand.enlive-html :as html]
-            [clj-time.core :as clj-time]
-            [clj-time.format :as clj-time-fmt]
-            [clj-time.coerce :as time-coerce]
-            [clogs.parser :as parser]
-            [clogs.render :as render]))
+  (:require [clogs.processor :as p]
+            [clogs.render :as r]
+            [clogs.postmaster :as pm]))
 
-(def *posts-folder* (str "resources/p/"))
-(def *index* "index.html") 
-(def *archives* "archives.html") 
-(def *colophon* "colophon.html")
+(def *index* "resources/index.html")
 
-(defn prepend-to-archives
-  "Prepends a formatted archive snippet string to  *archives*.
-
-   Places it before the first <article>"
-  [s]
-  (spit (str "resources/" *archives*)
-        (apply str (html/emit*
-                    (html/at (first (html/html-resource *archives*)) 
-                             [[:article (html/nth-of-type 1)]]
-                             (html/before
-                              (str \newline s \newline)))))))
+(defn publish-post
+  "Processes the post.md in 'postdir, adding the metadata to the postbox,
+   creating the index.html for the post and dating the post."
+  [postdir]
+  (let [meta (p/process-post-meta (p/extract-post-meta postdir))
+        rawcontent (p/extract-post-content postdir)
+        post (assoc meta :content (r/markdown rawcontent)
+                    :excapedcontent (r/escape-html rawcontent))] 
+    (p/replace-post-meta postdir meta)
+    (pm/add-to-postbox meta)
+    (spit (str postdir "index.html")
+          (r/base-render {:title (post :title)
+                          :body (r/just-post-snippet post)}))))
