@@ -3,6 +3,11 @@
             [clogs.dates :as dates])
   (:import [com.petebevin.markdown MarkdownProcessor]))
 
+
+(def *posts-folder* (str "resources/p/"))
+(def *index* "index.html") 
+(def *archives* "archives.html") 
+(def *colophon* "colophon.html")
 ;; defines the html/xml to be used as templates
 ;; loads this from settings.clogs later...
 ;; envlive reads from resources/ by default
@@ -31,6 +36,27 @@
   [s]
   (.markdown (MarkdownProcessor.) s))
 
+;; date stuff
+(defn reformat-date
+  "Parses 's and returns it in the format desired."
+  [s fmt]
+  (fmt (dates/date-from-string s)))
+
+(defn pretty-date
+  "Formats 's to the 'clgdate-string specification."
+  [s]
+  (reformat-date s dates/clgdate-string))
+
+(defn rss-date
+  "Formats 's to the 'rssdate-string specification."
+  [s]
+  (reformat-date s dates/rssdate-string))
+
+(defn pubdate-date
+  "Formats 's to the 'fulldate-string specification."
+  [s]
+  (reformat-date s dates/fulldate-string))
+  
 ;; taken from dnolen's excellent http://github.com/swannodette/enlive-tutorial
 (defmacro maybe-content
   ([expr] `(if-let [x# ~expr] (html/content x#) identity))
@@ -47,8 +73,8 @@
 (html/defsnippet just-post-snippet *post-template-file* [:body]
   [{:keys [title date content]}]
   [:article :h1] (html/content title)
-  [:article :time] (html/content (dates/clgdate-fmt date))
-  [:article :time] (html/set-attr :datetime (dates/datetime-fmt date))
+  [:article :time] (html/content (pretty-date date))
+  [:article :time] (html/set-attr :datetime (pubdate-date date))
   [:article :section] (html/content content))
 
 (html/defsnippet index-snippet *index-template-file* [:body]
@@ -59,9 +85,9 @@
                                  (html/set-attr :href (post :url))
                                  (html/content (post :title)))
               [:article :time] (html/do->
-                                (html/content (dates/clgdate-fmt (post :date)))
+                                (html/content (pretty-date (post :date)))
                                 (html/set-attr :datetime
-                                               (dates/datetime-fmt
+                                               (pubdate-date
                                                 (post :date))))
               [:article :section] (html/content (post :content))))
 
@@ -71,8 +97,8 @@
             (html/content (postmap :title))
             (html/set-attr :href (postmap :url)))
   [:time] (html/do->
-           (html/content (dates/clgdate-fmt (postmap :date)))
-           (html/set-attr :datetime (dates/datetime-fmt (postmap :date))))
+           (html/content (pretty-date (postmap :date)))
+           (html/set-attr :datetime (pubdate-date (postmap :date))))
   [:span#summary] (html/content (postmap :summary)))
 
 ;; takes a vector of {:title :date :summary :url} maps 
@@ -84,13 +110,25 @@
                                                 (html/set-attr :href
                                                                (abbr :url)))
                              [:article :time] (html/content
-                                               (dates/clgdate-fmt (abbr :date)))
+                                               (pretty-date (abbr :date)))
                              [:article :time] (html/set-attr
                                                :datetime
-                                               (dates/datetime-fmt
+                                               (pubdate-date
                                                 (abbr :date)))
                              [:article :span#summary] (html/content
                                                        (abbr :summary))))
+
+(defn prepend-to-archives
+  "Prepends a formatted archive snippet string to  *archives*.
+
+   Places it before the first <article>."
+  [s]
+  (spit (str "resources/" *archives*)
+        (apply str (html/emit*
+                    (html/at (first (html/html-resource *archives*)) 
+                             [[:article (html/nth-of-type 1)]]
+                             (html/before
+                              (str \newline s \newline)))))))
 
 ;; post = {:title :date :url :escapedcontent}
 ;; possible bug: this strips <?xml version="1.0" encoding="UTF-8"?>
@@ -99,7 +137,7 @@
   [posts]
   [:item] (html/clone-for [c posts]
                           [:item :title] (html/content (c :title))
-                          [:item :pubDate] (html/content (dates/rssdate-fmt
+                          [:item :pubDate] (html/content (rss-date
                                                           (c :date)))
                           [:item :link] (html/content (c :url))
                           [:item :description] (html/content
