@@ -22,10 +22,11 @@ http://www.aaronsw.com/weblog/000404
 Clojure + Blogs = Clogs and it's cute. That is all.
 
 ## Uses
-- clojure 1.1.0
-- clojure-contrib 1.1.0
+- clojure 1.2.0
+- clojure-contrib 1.2.0
 - enlive-1.0.0-SNAPSHOT
 - clj-time-0.1.0-SNAPSHOT
+- markdownj
 
 ## License
 © Isaac Hodes 2010
