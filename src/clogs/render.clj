@@ -30,10 +30,10 @@
   [s]
   (.markdown (MarkdownProcessor.) s))
 
+;; taken from dnolen's excellent http://github.com/swannodette/enlive-tutorial
 (defmacro maybe-content
   ([expr] `(if-let [x# ~expr] (html/content x#) identity))
   ([expr & exprs] `(maybe-content (or ~expr ~@exprs))))
-
 (defmacro maybe-substitute
   ([expr] `(if-let [x# ~expr] (html/substitute x#) identity))
   ([expr & exprs] `(maybe-substitute (or ~expr ~@exprs))))
@@ -59,7 +59,8 @@
                                  (html/content (post :title)))
               [:article :time] (html/do->
                                 (html/content (clgdate-fmt (post :date)))
-                                (html/set-attr :datetime (datetime-fmt (post :date))))
+                                (html/set-attr :datetime
+                                               (datetime-fmt (post :date))))
               [:article :section] (html/content (post :content))))
 
 (html/defsnippet single-archive-post *archive-template-file* [:article]
@@ -72,14 +73,14 @@
            (html/set-attr :datetime (datetime-fmt (postmap :date))))
   [:span#summary] (html/content (postmap :summary)))
 
-
 ;; takes a vector of {:title :date :summary :url} maps 
 (html/defsnippet archive-snippet *archive-template-file* [:body]
   [abbrev-posts]
   [:article] (html/clone-for [abbr abbrev-posts]
                              [:article :h1 :a] (html/do->
                                                 (html/content (abbr :title))
-                                                (html/set-attr :href (abbr :url)))
+                                                (html/set-attr :href
+                                                               (abbr :url)))
                              [:article :time] (html/content
                                                (clgdate-fmt (abbr :date)))
                              [:article :time] (html/set-attr
@@ -101,9 +102,3 @@
                           [:item :description] (html/content
                                                 (escape-html
                                                  (c :escapedcontent)))))
-
-
-;; what's next:
-;; markdown parser
-;; work out how the index (archives, etc) is built
-;; make prepend/append functions for index/archives etc

@@ -8,25 +8,10 @@
             [clogs.parser :as parser]
             [clogs.render :as render]))
 
-;; Dirs
-(def *absolute-root* "resources/") ;; root URL
-(def *posts-folder* (str *absolute-root* "p/")) ;; folder where permalinked posts go
-
-;; HTML files
-(def *index* "index.html") ;; index.html file location
-(def *archives* "darchives.html") ;; archive.html file location
-;;(def *archives* (str *absolute-root* "archives.html")) ;; archive.html file location
-(def *colophon* "colophon.html") ;; colophone.html file locations
-
- 
-(defn escape-html
-  "Escapes lt, gt, amp and quot from 's"
-  [s]
-  (-> s str
-      (.replace "&" "&amp;")
-      (.replace "<" "&lt;")
-      (.replace ">" "&gt;")
-      (.replace "\"" "&quot;")))
+(def *posts-folder* (str "resources/p/"))
+(def *index* "index.html") 
+(def *archives* "archives.html") 
+(def *colophon* "colophon.html")
 
 (defn prepend-to-archives
   "Prepends a formatted archive snippet string to  *archives*.
