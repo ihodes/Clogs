@@ -5,6 +5,7 @@
 
 ;; defines the html/xml to be used as templates
 ;; loads this from settings.clogs later...
+;; envlive reads from resources/ by default
 (def *index-template-file* "templates/index_template.html")
 (def *archive-template-file* "templates/archives_template.html")
 (def *post-template-file* "templates/post_template.html")
@@ -46,8 +47,8 @@
 (html/defsnippet just-post-snippet *post-template-file* [:body]
   [{:keys [title date content]}]
   [:article :h1] (html/content title)
-  [:article :time] (html/content (clgdate-fmt date))
-  [:article :time] (html/set-attr :datetime (datetime-fmt date))
+  [:article :time] (html/content (dates/clgdate-fmt date))
+  [:article :time] (html/set-attr :datetime (dates/datetime-fmt date))
   [:article :section] (html/content content))
 
 (html/defsnippet index-snippet *index-template-file* [:body]
@@ -58,9 +59,10 @@
                                  (html/set-attr :href (post :url))
                                  (html/content (post :title)))
               [:article :time] (html/do->
-                                (html/content (clgdate-fmt (post :date)))
+                                (html/content (dates/clgdate-fmt (post :date)))
                                 (html/set-attr :datetime
-                                               (datetime-fmt (post :date))))
+                                               (dates/datetime-fmt
+                                                (post :date))))
               [:article :section] (html/content (post :content))))
 
 (html/defsnippet single-archive-post *archive-template-file* [:article]
@@ -69,8 +71,8 @@
             (html/content (postmap :title))
             (html/set-attr :href (postmap :url)))
   [:time] (html/do->
-           (html/content (clgdate-fmt (postmap :date)))
-           (html/set-attr :datetime (datetime-fmt (postmap :date))))
+           (html/content (dates/clgdate-fmt (postmap :date)))
+           (html/set-attr :datetime (dates/datetime-fmt (postmap :date))))
   [:span#summary] (html/content (postmap :summary)))
 
 ;; takes a vector of {:title :date :summary :url} maps 
@@ -82,10 +84,11 @@
                                                 (html/set-attr :href
                                                                (abbr :url)))
                              [:article :time] (html/content
-                                               (clgdate-fmt (abbr :date)))
+                                               (dates/clgdate-fmt (abbr :date)))
                              [:article :time] (html/set-attr
                                                :datetime
-                                               (datetime-fmt (abbr :date)))
+                                               (dates/datetime-fmt
+                                                (abbr :date)))
                              [:article :span#summary] (html/content
                                                        (abbr :summary))))
 
@@ -96,7 +99,7 @@
   [posts]
   [:item] (html/clone-for [c posts]
                           [:item :title] (html/content (c :title))
-                          [:item :pubDate] (html/content (rssdate-fmt
+                          [:item :pubDate] (html/content (dates/rssdate-fmt
                                                           (c :date)))
                           [:item :link] (html/content (c :url))
                           [:item :description] (html/content
