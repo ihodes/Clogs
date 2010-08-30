@@ -7,6 +7,7 @@
 ;; postdir is the directory that the post is in. e.g e-and-clojure/
 ;; and inside that dir a post.md file, as well as whatever resources
 ;; used in the post (media etc)
+(def *base-url* "http://copperthoughts.com/")
 
 (defn extract-post-meta
   "Returns the map found on the first line of the post.md file.
@@ -36,23 +37,27 @@
   "Takes the post meta and adds to it as necessary.
 
    Currently, only adds date if needed, or else
-   formats it correctly."
-  [m]
+   formats it correctly.
+
+   You must add the postdir, as well, but as an arg."
+  [m postdir]
   (assoc m :date (d/fulldate-string
-                  (d/date-from-string (m :date)))))
+                  (d/date-from-string (m :date)))
+         :postdir postdir
+         :url (str *base-url* postdir)))
 
 (defn assoc-content
   "Assocs the content (html of the markdown) of the post associated
    with 'm, metadata."
   [m]
-  (let [content (r/markdown (extract-post-content (:url m)))]
+  (let [content (r/markdown (extract-post-content (:postdir m)))]
     (assoc m :content content)))
 
 (defn assoc-escaped-content
   "Assocs the escaped content (escaped html of the markdown)
    of the post associated  with 'm, metadata."
   [m]
-  (let [content (r/escape-html (extract-post-content (:url m)))]
+  (let [content (r/escape-html (extract-post-content (:postdir m)))]
     (assoc m :content content)))
 
 (defn replace-post-meta
