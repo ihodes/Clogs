@@ -101,6 +101,11 @@
            (html/set-attr :datetime (pubdate-date (postmap :date))))
   [:span#summary] (html/content (postmap :summary)))
 
+(defn archive-post-string
+  "Returns a string of the proper HTML for an article post."
+  [postmap]
+  (concat-strings (html/emit* (single-archive-post postmap))))
+
 ;; takes a vector of {:title :date :summary :url} maps 
 (html/defsnippet archive-snippet *archive-template-file* [:body]
   [abbrev-posts]
@@ -117,18 +122,6 @@
                                                 (abbr :date)))
                              [:article :span#summary] (html/content
                                                        (abbr :summary))))
-
-(defn prepend-to-archives
-  "Prepends a formatted archive snippet string to  *archives*.
-
-   Places it before the first <article>."
-  [s]
-  (spit (str "resources/" *archives*)
-        (apply str (html/emit*
-                    (html/at (first (html/html-resource *archives*)) 
-                             [[:article (html/nth-of-type 1)]]
-                             (html/before
-                              (str \newline s \newline)))))))
 
 ;; post = {:title :date :url :escapedcontent}
 ;; possible bug: this strips <?xml version="1.0" encoding="UTF-8"?>
