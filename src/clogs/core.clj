@@ -12,7 +12,7 @@
   "Processes the post.md in 'postdir, adding the metadata to the postbox,
    creating the index.html for the post and dating the post."
   [postdir]
-  (let [meta (p/process-post-meta (p/extract-post-meta postdir))
+  (let [meta (p/process-post-meta (p/extract-post-meta postdir) postdir)
         rawcontent (p/extract-post-content postdir)
         post (assoc meta :content (r/markdown rawcontent)
                     :excapedcontent (r/escape-html rawcontent))] 
