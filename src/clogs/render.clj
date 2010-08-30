@@ -1,62 +1,109 @@
 (ns clogs.render
-  (:require [net.cgrand.enlive-html :as html])
-  (:use compojure.core
-        [clojure.contrib.duck-streams :only (spit)]))
+  (:require [net.cgrand.enlive-html :as html]
+            [clogs.dates :as dates])
+  (:import [com.petebevin.markdown MarkdownProcessor]))
 
-;; defines the html/xml to be used as a template(s)
+;; defines the html/xml to be used as templates
 ;; loads this from settings.clogs later...
-(def *index-template-file* "resources/templates/template_index.html")
-(def *archive-template-file* "resources/templates/template_archive.html")
-(def *post-template-file* "resources/templates/template_post.html")
-(def *raw-post-template* "resources/p/posts/post.xml")
+(def *index-template-file* "templates/index_template.html")
+(def *archive-template-file* "templates/archives_template.html")
+(def *post-template-file* "templates/post_template.html")
+(def *base-template-file* "templates/base_template.html")
+(def *rss-template-file* "templates/feed_template.xml")
 
-(defn render
+(defn concat-strings
   "Concats a list of strings."
-  [x]
-  (apply str x))
+  [ss]
+  (apply str ss))
 
-;; models a post in the index and individual post page
-(html/defsnippet post-model *index-template-file* [:.cg-post]
-  [{:keys [title author clgdate content perm-url]}]
-  [:span.cg-post-title] (html/content title)
-  [:a.cg-post-title ] (html/set-attr :href perm-url)
-  [:.cg-post-author] (html/content author)
-  [:.cg-post-pubdate] (html/content clgdate)
-  [:.cg-post-text] (html/html-content content))
+(defn escape-html
+  "Escapes lt, gt, amp and quot from 's"
+  [s]
+  (-> s str
+      (.replace "&" "&amp;")
+      (.replace "<" "&lt;")
+      (.replace ">" "&gt;")
+      (.replace "\"" "&quot;")))
 
-;; models an archive listing 
-(html/defsnippet archive-listing-model *archive-template-file* [:.cg-post]
-  [{:keys [title author pubdate perm-url]}]
-  [:span.cg-post-title] (html/content title)
-  [:a.cg-post-title ] (html/set-attr :href perm-url)
-  [:.cg-post-author] (html/content author)
-  [:.cg-post-pubdate] (html/content pubdate))
+(defn markdown
+  "Returns the HTML version of the Markdown string 's."
+  [s]
+  (.markdown (MarkdownProcessor.) s))
 
-;; renders the html file for archive.html
-;; takes in a clojure map as emitted by parser/assemble-map-posts
-(html/deftemplate render-archive *archive-template-file*
-  [{:keys [posts]}]
-  [:.cg-wrap] (html/clone-for [post posts]
-                              (html/content (archive-listing-model post))))
+(defmacro maybe-content
+  ([expr] `(if-let [x# ~expr] (html/content x#) identity))
+  ([expr & exprs] `(maybe-content (or ~expr ~@exprs))))
 
-;; renders the html file for an individual post
-;; takes in a clojure map as emitted by parser/assemble-map-posts
-(html/deftemplate render-post *post-template-file*
-  [post]
-  [:.cg-wrap] (html/content (post-model post)))
+(defmacro maybe-substitute
+  ([expr] `(if-let [x# ~expr] (html/substitute x#) identity))
+  ([expr & exprs] `(maybe-substitute (or ~expr ~@exprs))))
 
-;; models an XML post
-(html/deftemplate render-raw-post *raw-post-template*
-  [{:keys [title author content clgdate-norm perm-url]}]
-  [:title] (html/content title)
-  [:perm-url] (html/content perm-url)
-  [:author] (html/content author)
-  [:content] (html/content content)
-  [:clgdate-norm] (html/content clgdate-norm))
+(html/deftemplate base-render *base-template-file*
+  [{:keys [title body]}]
+  [:title] (html/append (when-not (nil? title) (str " | " title)))
+  [:body] (maybe-substitute body))
 
-;; renders the html file for index.html
-;; takes in a clojure map as emitted by parser/assemble-map-posts
-(html/deftemplate render-index *index-template-file*
-  [{:keys [posts]}]
-  [:.cg-wrap] (html/clone-for [post posts]
-                              (html/content (post-model post))))
+(html/defsnippet just-post-snippet *post-template-file* [:body]
+  [{:keys [title date content]}]
+  [:article :h1] (html/content title)
+  [:article :time] (html/content (clgdate-fmt date))
+  [:article :time] (html/set-attr :datetime (datetime-fmt date))
+  [:article :section] (html/content content))
+
+(html/defsnippet index-snippet *index-template-file* [:body]
+  [posts]
+  [:article] (html/clone-for
+              [post posts]
+              [:article :h1 :a] (html/do->
+                                 (html/set-attr :href (post :url))
+                                 (html/content (post :title)))
+              [:article :time] (html/do->
+                                (html/content (clgdate-fmt (post :date)))
+                                (html/set-attr :datetime (datetime-fmt (post :date))))
+              [:article :section] (html/content (post :content))))
+
+(html/defsnippet single-archive-post *archive-template-file* [:article]
+  [postmap]
+  [:h1 :a] (html/do->
+            (html/content (postmap :title))
+            (html/set-attr :href (postmap :url)))
+  [:time] (html/do->
+           (html/content (clgdate-fmt (postmap :date)))
+           (html/set-attr :datetime (datetime-fmt (postmap :date))))
+  [:span#summary] (html/content (postmap :summary)))
+
+
+;; takes a vector of {:title :date :summary :url} maps 
+(html/defsnippet archive-snippet *archive-template-file* [:body]
+  [abbrev-posts]
+  [:article] (html/clone-for [abbr abbrev-posts]
+                             [:article :h1 :a] (html/do->
+                                                (html/content (abbr :title))
+                                                (html/set-attr :href (abbr :url)))
+                             [:article :time] (html/content
+                                               (clgdate-fmt (abbr :date)))
+                             [:article :time] (html/set-attr
+                                               :datetime
+                                               (datetime-fmt (abbr :date)))
+                             [:article :span#summary] (html/content
+                                                       (abbr :summary))))
+
+;; post = {:title :date :url :escapedcontent}
+;; possible bug: this strips <?xml version="1.0" encoding="UTF-8"?>
+;; from the xml template
+(html/deftemplate rss-render (html/xml-resource *rss-template-file*)
+  [posts]
+  [:item] (html/clone-for [c posts]
+                          [:item :title] (html/content (c :title))
+                          [:item :pubDate] (html/content (rssdate-fmt
+                                                          (c :date)))
+                          [:item :link] (html/content (c :url))
+                          [:item :description] (html/content
+                                                (escape-html
+                                                 (c :escapedcontent)))))
+
+
+;; what's next:
+;; markdown parser
+;; work out how the index (archives, etc) is built
+;; make prepend/append functions for index/archives etc
