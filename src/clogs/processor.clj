@@ -41,6 +41,20 @@
   (assoc m :date (d/fulldate-string
                   (d/date-from-string (m :date)))))
 
+(defn assoc-content
+  "Assocs the content (html of the markdown) of the post associated
+   with 'm, metadata."
+  [m]
+  (let [content (r/markdown (extract-post-content (:url m)))]
+    (assoc m :content content)))
+
+(defn assoc-escaped-content
+  "Assocs the escaped content (escaped html of the markdown)
+   of the post associated  with 'm, metadata."
+  [m]
+  (let [content (r/escape-html (extract-post-content (:url m)))]
+    (assoc m :content content)))
+
 (defn replace-post-meta
   "Replaces the metadata map of the post.md in postdir
    with 'm."
