@@ -6,8 +6,9 @@
 
 (def *index* "resources/index.html")
 (def *archives* "resources/archives.html")
+(def *feed* "resources/feed.xml")
 
-(defn publish-post
+(defn pre-publish-post
   "Processes the post.md in 'postdir, adding the metadata to the postbox,
    creating the index.html for the post and dating the post."
   [postdir]
@@ -28,7 +29,15 @@
              (r/base-render
               {:title nil
                :body (r/index-snippet
-                      (take-last n pm/posts))}))))
+                      (map p/assoc-content (take-last n pm/posts)))}))))
+
+(defn build-rss
+  "Creates the rss feed with the last 'n posts."
+  ([] (build-index 5))
+  ([n] (spit *feed*
+             (r/rss-render
+              (r/index-snippet
+               (map p/assoc-escaped-content (take-last n pm/posts)))))))
 
 (defn prepend-to-archives
   "Prepends a formatted archive snippet string to  *archives*.
@@ -51,3 +60,12 @@
     (prepend-to-archives
      (r/archive-post-string post))))
 
+(defn publish-post
+  "Publish post to index, archives and rss, as well as create the permalink."
+  [postdir]
+  (pre-publish-post postdir)
+  (post-to-archive postdir)
+  (build-index 5)
+  (build-rss 5))
+
+  
