@@ -27,3 +27,24 @@ Clojure + Blogs = Clogs and it's cute. That is all.
 * clj-time-0.1.0-SNAPSHOT
 * markdownj
 
+## To Use 
+####Preliminary (this is an alpha version, after all)
+You'll want to make a directory to hold all of your posts (I use `p/`) and put it in the `resource/` directory. 
+
+Now you can make your first post. It's simple: create another directory, this time with the name you want to be the post's URL. Place that directory inside the `p/` directory, and create a `post.md` file. On the first line of that file, you should create a map: this will be used to supply the metadata for the post. Right now, you should at *least* supply a `:title`, which will be used as, you guessed it, the title of the post, and `:summary` that is used on the archives page. 
+
+e.g. `{:title "How to do this" :summary "Wherein I explain how this is done."}`
+
+Under that, you may start writing your post, in the Markdown syntax.
+
+When you are ready to publish, the process for the first post is a little different. 
+
+Where postdir = "resources/p/your-post-dir/", run these commands in the `core` namespace:
+1) (pre-publish-post postdir)
+2) (build-index)
+3) (build-rss)
+4) (build-archives)
+
+And you should be set. 
+
+For subsequent posts, you should run Clogs and, in the `core` namespace, run (publish-post "resources/p/post-dir/"). You should then be good to go. 
