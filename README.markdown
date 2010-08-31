@@ -35,6 +35,12 @@ Now you can make your first post. It's simple: create another directory, this ti
 
 e.g. `{:title "How to do this" :summary "Wherein I explain how this is done."}`
 
+If you want, you can add your own "published" date: 
+
+   :date "2010-08-22"
+
+Note that it's in the form "YYYY-MM-DD", which is required.
+
 Under that, you may start writing your post, in the Markdown syntax.
 
 When you are ready to publish, the process for the first post is a little different. 
