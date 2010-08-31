@@ -8,36 +8,34 @@
 ;; and inside that dir a post.md file, as well as whatever resources
 ;; used in the post (media etc)
 (def *base-url* "http://copperthoughts.com/")
+(def *post-base* "resources/")
+
+(defn full-post-dir
+  "Returns the full post path."
+  [postdir]
+  (str *post-base* postdir))
 
 (defn extract-post-meta
   "Returns the map found on the first line of the post.md file.
    'postdir is a directory that contains a post.md file.
 
-   e.g. resources/p/test/"
+   e.g. p/test/"
   [postdir]
-  (with-open [f (io/reader (str postdir "post.md"))]
-    (assoc (read-string (first (take 1 (line-seq f))))
-      :url postdir)))
+  (with-open [f (io/reader (str (full-post-dir postdir) "post.md"))]
+    (read-string (first (take 1 (line-seq f))))))
 
 (defn extract-post-content
   "Returns, as a string of text, the content of a post.md,
    given its directory"
   [postdir]
-  (with-open [f (io/reader (str postdir "post.md"))]
+  (with-open [f (io/reader (str (full-post-dir postdir) "post.md"))]
     (s/join \newline (drop 1 (line-seq f)))))
-
-(defn content-to-html
-  "Creates a post.html file from the post.md in the
-   specified 'postdir."
-  [postdir]
-  (spit (str postdir "post.html")
-        (r/markdown (extract-post-content postdir))))
 
 (defn process-post-meta
   "Takes the post meta and adds to it as necessary.
 
-   Currently, only adds date if needed, or else
-   formats it correctly.
+   Currently, only adds the url, and date if needed, or else
+   formats the date correctly.
 
    You must add the postdir, as well, but as an arg."
   [m postdir]
@@ -66,7 +64,7 @@
   [postdir m]
   (let [content (extract-post-content postdir)
         newpost (str m \newline content)]
-    (spit (str postdir "post.md") newpost)))
+    (spit (str(full-post-dir  postdir) "post.md") newpost)))
     
     
   
