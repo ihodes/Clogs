@@ -1,4 +1,0 @@
-{:pubdate "2010-08-20T11:30" :title "E and Clojure" :url "p/e-and-clojure" :author "Isaac Hodes"}
-{:pubdate "2010-08-24T04:00" :title "Something About Robots" :url "p/something-about-robots" :author "Isaac Hodes"}
-{:pubdate "2010-08-27T17:54" :title "Snacks and Cookies" :url "p/snacks-cookies" :author "Isaac Hodes"}
-{:pubdate "2010-08-29T20:29" :title "Clojure and Java and Monkeys" :url "p/clojure-java-monkeys" :author "Isaac Hodes"}
