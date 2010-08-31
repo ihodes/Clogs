@@ -134,5 +134,5 @@
                           [:item :pubDate] (html/content (rss-date
                                                           (c :date)))
                           [:item :link] (html/content (c :url))
-                          [:item :description] (html/content
-                                                 (c :escapedcontent))))
+                          [:item :description] (html/html-content
+                                                 (c :content))))
