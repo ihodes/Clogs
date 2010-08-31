@@ -72,24 +72,25 @@
 
 (html/defsnippet just-post-snippet *post-template-file* [:body]
   [{:keys [title date content]}]
-  [:article :h1] (html/content title)
-  [:article :time] (html/content (pretty-date date))
-  [:article :time] (html/set-attr :datetime (pubdate-date date))
-  [:article :section] (html/content content))
+  [:article :header :h1] (html/content title)
+  [:article :header :time] (html/do->
+                            (html/content (pretty-date date))
+                            (html/set-attr :datetime (pubdate-date date)))
+  [:article :section] (html/html-content content))
 
 (html/defsnippet index-snippet *index-template-file* [:body]
   [posts]
   [:article] (html/clone-for
               [post posts]
-              [:article :h1 :a] (html/do->
+              [:article :header :h1 :a] (html/do->
                                  (html/set-attr :href (post :url))
                                  (html/content (post :title)))
-              [:article :time] (html/do->
+              [:article :header :time] (html/do->
                                 (html/content (pretty-date (post :date)))
                                 (html/set-attr :datetime
                                                (pubdate-date
                                                 (post :date))))
-              [:article :section] (html/content (post :content))))
+              [:article :section] (html/html-content (post :content))))
 
 (html/defsnippet single-archive-post *archive-template-file* [:article]
   [postmap]
@@ -99,7 +100,7 @@
   [:time] (html/do->
            (html/content (pretty-date (postmap :date)))
            (html/set-attr :datetime (pubdate-date (postmap :date))))
-  [:span#summary] (html/content (postmap :summary)))
+  [:span#summary] (html/html-content (postmap :summary)))
 
 (defn archive-post-string
   "Returns a string of the proper HTML for an article post."
@@ -120,7 +121,7 @@
                                                :datetime
                                                (pubdate-date
                                                 (abbr :date)))
-                             [:article :span#summary] (html/content
+                             [:article :span.summary] (html/html-content
                                                        (abbr :summary))))
 
 ;; post = {:title :date :url :escapedcontent}
@@ -134,5 +135,4 @@
                                                           (c :date)))
                           [:item :link] (html/content (c :url))
                           [:item :description] (html/content
-                                                (escape-html
-                                                 (c :escapedcontent)))))
+                                                 (c :escapedcontent))))
