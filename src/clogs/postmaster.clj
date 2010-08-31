@@ -9,10 +9,11 @@
   [m]
   (with-open [w (io/writer (io/file *postbox*)
                            :append true)]
-    (spit w (str \newline m))))
+    (spit w (str m \newline))))
 
 ;; lazy seq of post-maps in the postbox
-(def posts
-     (map read-string (line-seq (reader *postbox*))))
+(defn posts
+  []
+  (map read-string (line-seq (reader *postbox*))))
 
 ;; later: (find-post :date  "2010") (all posts with 2010 in the date) etc
