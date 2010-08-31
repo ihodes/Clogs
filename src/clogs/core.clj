@@ -4,6 +4,8 @@
             [clogs.render :as r]
             [clogs.postmaster :as pm]))
 
+(def *posts-to-show* 5)
+
 (def *index* "resources/index.html")
 (def *archives* "resources/archives.html")
 (def *feed* "resources/feed.xml")
@@ -14,42 +16,53 @@
   [postdir]
   (let [meta (p/process-post-meta (p/extract-post-meta postdir) postdir)
         rawcontent (p/extract-post-content postdir)
-        post (assoc meta :content (r/markdown rawcontent)
-                    :excapedcontent (r/escape-html rawcontent))] 
+        post (assoc meta
+               :content (r/markdown rawcontent))]
     (p/replace-post-meta postdir meta)
     (pm/add-to-postbox meta)
     (spit (str postdir "index.html")
-          (r/base-render {:title (post :title)
-                          :body (r/just-post-snippet post)}))))
+          (r/concat-strings
+           (r/base-render {:title (post :title)
+                           :body (r/just-post-snippet post)})))))
 
 (defn build-index
   "Creates the index with the last 'n posts."
-  ([] (build-index 5))
+  ([] (build-index *posts-to-show*))
   ([n] (spit *index*
-             (r/base-render
-              {:title nil
-               :body (r/index-snippet
-                      (map p/assoc-content (take-last n pm/posts)))}))))
+             (r/concat-strings
+              (r/base-render
+               {:title nil
+                :body (r/index-snippet
+                       (map p/assoc-content (reverse (take-last n (pm/posts)))))})))))
 
 (defn build-rss
   "Creates the rss feed with the last 'n posts."
-  ([] (build-index 5))
+  ([] (build-rss *posts-to-show*))
   ([n] (spit *feed*
-             (r/rss-render
-              (r/index-snippet
-               (map p/assoc-escaped-content (take-last n pm/posts)))))))
+             (r/concat-strings
+              (r/rss-render
+               (map p/assoc-escaped-content (reverse (take-last n (pm/posts)))))))))
 
-(defn prepend-to-archives
+(defn build-archives
+  []
+  (spit *archives*
+        (r/concat-strings
+         (r/base-render
+          {:title "The Archives"
+           :body (r/archive-snippet (reverse (pm/posts)))}))))
+
+(defn- prepend-to-archives
   "Prepends a formatted archive snippet string to  *archives*.
 
    Places it before the first <article>."
   [s]
   (spit *archives*
-        (apply str (html/emit*
-                    (html/at (first (html/html-resource "archives.html")) 
-                             [[:article (html/nth-of-type 1)]]
-                             (html/before
-                              (str \newline s \newline)))))))
+        (r/concat-strings
+         (html/emit*
+          (html/at (first (html/html-resource "archives.html")) 
+                   [[:article (html/nth-of-type 1)]]
+                   (html/before
+                    (str \newline s \newline)))))))
 
 (defn post-to-archive
   "Prepends the specified post to the archives."
@@ -65,7 +78,5 @@
   [postdir]
   (pre-publish-post postdir)
   (post-to-archive postdir)
-  (build-index 5)
-  (build-rss 5))
-
-  
+  (build-index *posts-to-show*)
+  (build-rss *posts-to-show*))
