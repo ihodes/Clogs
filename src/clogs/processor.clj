@@ -57,8 +57,8 @@
   "Assocs the escaped content (escaped html of the markdown)
    of the post associated  with 'm, metadata."
   [m]
-  (let [content (r/escape-html (extract-post-content (:postdir m)))]
-    (assoc m :content content)))
+  (let [content (r/escape-html (r/markdown (extract-post-content (:postdir m))))]
+    (assoc m :escapedcontent content)))
 
 (defn replace-post-meta
   "Replaces the metadata map of the post.md in postdir
