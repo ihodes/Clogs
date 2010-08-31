@@ -46,10 +46,11 @@ Under that, you may start writing your post, in the Markdown syntax.
 When you are ready to publish, the process for the first post is a little different. 
 
 Where postdir = "resources/p/your-post-dir/", run these commands in the `core` namespace:
-1) (pre-publish-post postdir)
-2) (build-index)
-3) (build-rss)
-4) (build-archives)
+
+* (pre-publish-post postdir)
+* (build-index)
+* (build-rss)
+* (build-archives)
 
 And you should be set. 
 
