@@ -12,8 +12,8 @@
 (defn date-from-string
   "Attempts to parse the date from the 's.
 
-  If it isn't in either the full-date-format or
-  short-date-format, then it returns the current date."
+  If it isn't in either the full-date-format or short-date-format,
+  then it returns the current date and UTC time."
   [s]
   (try (time-fmt/parse full-date-fmt s)
        (catch Exception e
