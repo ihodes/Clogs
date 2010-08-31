@@ -1,0 +1,160 @@
+/*
+Copper thoughts theme copyright 2010 Isaac Hodes
+
+Palette:
+background: #eef9f9
+blue: #256d91
+orange: #ffaf00
+light greyish: #e0dfce
+
+*/
+html {
+    border-top: 10px #393a3c  solid;
+    background: #eef9f9;
+}
+
+body {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 14px;
+    width: 670px;
+    margin-left: auto;
+    margin-right: auto;
+    color: #393a3c;
+}
+
+a { color: #256d91; text-decoration: none; }
+a:hover { color: #ffaf00; }
+span.orange { color: #ffaf00;}
+span.blue { color: #256d91; }
+ 
+header#master{
+    padding: 5px;
+    margin-bottom: 107px;
+}
+header#master h1 {
+    color: #256d91;
+    font-size: 41px;
+    font-family: "Helvetica Neue";
+    font-weight: 200;
+}
+header#master h2 {
+    color: #256d91;
+    font-size: 30px;
+    font-family: "Helvetica Neue";
+    font-weight: 200;
+}
+header#master #tagline {
+    line-height: 1.8em;
+    font-size: 15px;
+    font-weight: bold;
+}
+header#master nav {
+    font-size: 16px;
+    margin-top: 0%;
+    text-align: right;
+    margin-top: -80px;
+    padding-top: 20px;
+}
+
+/******* ARTICLES *********/
+
+/** header **/
+article { padding: 20px 10px 20px 10px; }
+article header h1 { color: #256d91; font-size: 28px; font-family: "Helvetica Neue"; font-weight: 200; }
+article header time {
+    display: block;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    margin-left: 85%;
+    color: #ffaf00;
+    text-align: right;
+    background: url("dateecho.png") no-repeat 0 -5;
+    padding-left: 50px;
+}
+
+/** section **/
+article section { padding-left: 20px; padding-top: 20px; border-bottom: 1px solid #e0dfce; margin-bottom: 45px; padding-bottom: 20px;}
+article section p {
+    font-family: Optima, Futura, "Gill Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-bottom: 15px;
+    line-height: 1.4em;
+    font-size: 16px;
+}
+article section code {
+    background: #fefeef;
+    padding: 2px;
+    font-size: 14px;
+    font-family: Inconsolata, Consolata, "Andale Mono", Courier, "Courier New", monospace;
+}
+article section pre {
+    padding-bottom: 15px;
+    margin-left: -20px;
+    margin-right: -20px;
+    background: #fefeef;
+    padding: 15px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    color: black;
+    font-size: 14px;
+    font-weight: 400;
+    border: #256d91 2px solid;
+}
+article section pre code {
+    background: none;
+    padding: 0px;
+}
+article section blockquote {
+    font-size: 16px;
+    padding-left: 20px;
+}
+article section li {
+    line-height: 1.4em;
+    list-style: url("li-bullet.png") inside;
+    text-indent: -1.4em;
+    padding: 5px;
+    padding-left: 20px;
+    font-size: 16px;
+    font-family: Georgia, Verdana, sans-serif;
+}
+article section b, strong {
+    font-weight: bold;
+}
+article section i, em {
+    font-style: italic
+}
+article section a {
+    text-shadow: 2px 2px #fefeef;
+    font-style: bold;
+}
+article section a:hover{
+    text-shadow: 1px 1px #555;
+}
+article section hr {
+    margin-bottom: 20px;
+    border: 0;
+    height: 10px;
+    background: url("hr.png") repeat-x;
+    width: 450px;
+}
+article section img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+article section h1 { padding-bottom: 17px; font-size: 19px; font-style: bold; }
+article section h2 { padding-bottom: 15px; font-size: 18px; font-style: bold; }
+article section h3 { padding-bottom: 13px; font-size: 16px; font-style: bold;}
+article section h4 { padding-bottom: 11px; font-size: 15px; font-style: italic; }
+article section h5 { padding-bottom: 11px; font-size: 14px; font-style: italic; }
+article section h6 { padding-bottom: 9px; font-size: 12px; font-style: italic; }
+
+/************* ARCHIVES ***********/
+
+article span.summary {
+    display: block;
+    margin-top: 10px;
+    font-style: italic;
+}
