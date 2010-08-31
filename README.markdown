@@ -45,7 +45,7 @@ Under that, you may start writing your post, in the Markdown syntax.
 
 When you are ready to publish, the process for the first post is a little different. 
 
-Where postdir = "resources/p/your-post-dir/", run these commands in the `core` namespace:
+Where postdir = "p/your-post-dir/", run these commands in the `core` namespace:
 
 * (pre-publish-post postdir)
 * (build-index)
@@ -54,4 +54,21 @@ Where postdir = "resources/p/your-post-dir/", run these commands in the `core` n
 
 And you should be set. 
 
-For subsequent posts, you should run Clogs and, in the `core` namespace, run (publish-post "resources/p/post-dir/"). You should then be good to go. 
+For subsequent posts, you should run Clogs and, in the `core` namespace, run (publish-post "p/post-dir/"). You should then be good to go. 
+
+## Bugs 
+There are a lot: 
+
+* RSS renders with HTML tags showing: unformatted.
+* Archives get rebuilt each time: this could quickly grow difficult. Need to get the prepend to archives function working.
+
+
+## Todo: 
+Tons to do, but here's a short list:
+
+* There's no easy way to edit or delete posts 
+* Need to make it easier to deploy
+* Need to write my own Markdown generator, as MarkdownJ doesn't handle some cases correctly.
+* Need to make it easy to deploy on a live site
+* Need to support MarsEdit
+* Need to support/write docs for custom templates and styles
