@@ -31,9 +31,9 @@ Clojure + Blogs = Clogs and it's cute. That is all.
 ####Preliminary (this is an alpha version, after all)
 You'll want to make a directory to hold all of your posts (I use `p/`) and put it in the `resource/` directory. 
 
-Now you can make your first post. It's simple: create another directory, this time with the name you want to be the post's URL. Place that directory inside the `p/` directory, and create a `post.md` file. On the first line of that file, you should create a map: this will be used to supply the metadata for the post. Right now, you should at *least* supply a `:title`, which will be used as, you guessed it, the title of the post, and `:summary` that is used on the archives page. 
+Now you can make your first post. It's simple: create another directory, this time with the name you want to be the post's URL. Place that directory inside the `p/` directory, and create a `post.md` file. On the first line of that file, you should create a map: this will be used to supply the metadata for the post. Right now, you should at *least* supply a `:title`, which will be used as, you guessed it, the title of the post, and `:summary` that is used on the archives page, as well as an `:author` key and value.
 
-e.g. `{:title "How to do this" :summary "Wherein I explain how this is done."}`
+e.g. `{:title "How to do this" :summary "Wherein I explain how this is done." :author "Isaac Hodes"}`
 
 If you want, you can add your own "published" date: 
 
@@ -45,30 +45,15 @@ Under that, you may start writing your post, in the Markdown syntax.
 
 When you are ready to publish, the process for the first post is a little different. 
 
-Where postdir = "p/your-post-dir/", run these commands in the `core` namespace:
-
-* (pre-publish-post postdir)
-* (build-index)
-* (build-rss)
-* (build-archives)
-
-And you should be set. 
-
-For subsequent posts, you should run Clogs and, in the `core` namespace, run (publish-post "p/post-dir/"). You should then be good to go. 
+Where postdir = "p/your-post-dir/", run `(publish-post postdir)`, and you should be set. 
 
 ## Bugs 
-There are a lot: 
-
-* RSS renders with HTML tags showing: unformatted.
-* Archives get rebuilt each time: this could quickly grow difficult. Need to get the prepend to archives function working.
-
+There are none that I've found, yet, but be careful to make backups of everything as not a lot of testing has been done.
 
 ## Todo: 
 Tons to do, but here's a short list:
 
-* There's no easy way to edit or delete posts 
 * Need to make it easier to deploy
 * Need to write my own Markdown generator, as MarkdownJ doesn't handle some cases correctly.
-* Need to make it easy to deploy on a live site
-* Need to support MarsEdit
+* Need to support MarsEdit (xmlrpc)
 * Need to support/write docs for custom templates and styles
