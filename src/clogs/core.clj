@@ -1,7 +1,6 @@
 (ns clogs.core
   (:require [clogs.publisher :as pub]))
 
-
 (defn help
   "Prints out how to use Clogs."
   [] (prn "a post is a .md file entitled post.md in the postdir that you specify
@@ -12,9 +11,16 @@
  To publish a post, (publish-post 'p) where p is the postdir. "))
 
 (defn publish-post
+  "Publishes the post at 'postdir"
   [postdir]
   (pub/publish-post postdir))
 
 (defn delete-post
+  "Completely removes the post found at 'postdir"
   [postdir]
   (pub/complete-delete-post postdir))
+
+(defn update-post
+  "Replaces the post at 'postdir with a new 'postdir"
+  [postdir]
+  (pub/update-post postdir))

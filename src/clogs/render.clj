@@ -76,7 +76,7 @@
   [:article :header :time] (html/do->
                             (html/content (pretty-date date))
                             (html/set-attr :datetime (pubdate-date date)))
-  [:article :section] (html/html-content ent))
+  [:article :section] (html/html-content content))
 
 (html/defsnippet index-snippet *index-template-file* [:body]
   [posts]

@@ -21,7 +21,7 @@
   [pvec]
   (let [_ (spit *postbox* nil)]
     (for [p pvec]
-      (if (not (nil? p)) (add-to-postbox p)))))
+      (if (not (nil? p)) (pb-add-to-postbox p)))))
 
 (defn pb-posts
   "Returns a seq of post maps."
@@ -31,14 +31,14 @@
 (defn pb-edit-post
   "Removes the postmap with postdir='pd, and replaces it with 'm. If 'm is nil, then the post is deleted"
   [pd m]
-  (new-postbox
-   (for [p (posts)]
+  (pb-new-postbox
+   (for [p (pb-posts)]
      (cond (= pd (:postdir p)) m
 	   :else p))))
 
 (defn pb-delete-post
   "Removes the post with :postdir pd from the postbox."
   [pd]
-  (edit-post pd nil))
+  (pb-edit-post pd nil))
 
 ;; later: (find-post :date  "2010") (all posts with 2010 in the date) etc
