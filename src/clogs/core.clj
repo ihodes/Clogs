@@ -1,26 +1,17 @@
 (ns clogs.core
+  (:use net.cgrand.moustache
+	ring.middleware.stacktrace
+	ring.util.response
+	ring.middleware.params
+	[ring.adapter.jetty :only [run-jetty]])
   (:require [clogs.publisher :as pub]))
 
-(defn help
-  "Prints out how to use Clogs."
-  [] (prn "a post is a .md file entitled post.md in the postdir that you specify
- the first line of a post is a clojure map with any metadata you'd like
- the map must include keys: :title (str) :summary (str) :author (str)
- other keys used are :tags (str: comma delimited) :location (str) :linked-list (bool)
 
- To publish a post, (publish-post 'p) where p is the postdir. "))
+(declare clogs-app)
 
-(defn publish-post
-  "Publishes the post at 'postdir"
-  [postdir]
-  (pub/publish-post postdir))
+(def server (doto (Thread. #(run-jetty #'hn-srch-app {:port 8080})) .start))
 
-(defn delete-post
-  "Completely removes the post found at 'postdir"
-  [postdir]
-  (pub/complete-delete-post postdir))
 
-(defn update-post
-  "Replaces the post at 'postdir with a new 'postdir"
-  [postdir]
-  (pub/update-post postdir))
+;; routing
+(def clogs-app
+     )
