@@ -1,3 +1,7 @@
+### Nota Bene
+
+Development stopped on this a while ago, as I figured out that Jekyll did exactly what I was trying to do here. I may get around to getting this right someday, but for now I happily use Jekyll on my personal blog.
+
 # Clogs
 
 Clogs is a simple, Clojure-powered baked blogging engine.
